@@ -1,24 +1,22 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+
+import ReactMapbox from './Components/ReactMapbox'
+// import logo from './logo.svg';
+// import './App.css';
 
 function App() {
+// const [viewport, setViewport] = useState({
+//   latitude : 45.4211,
+//   longitude :-75,
+//   width: "100vw",
+//   height: "100vh",
+//   zoom:10
+// })
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <ReactMapbox></ReactMapbox>
+
     </div>
   );
 }
