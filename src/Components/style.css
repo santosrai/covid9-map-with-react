@@ -30,3 +30,19 @@
     width: 20px;
     height: 20px;
 }
+
+.banner {
+    font-family: "Uber Move";
+    font-size: 14px;
+    line-height: 18px;
+    width: 284px;
+    background: #fff;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+    margin: 24px;
+    padding: 12px 24px;
+    /* position: absolute; */
+    top: 0;
+    right: 0;
+    outline: none;
+    cursor: auto;
+  }

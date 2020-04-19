@@ -1,84 +1,108 @@
 /* eslint-disable */
 require('dotenv').config()
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
-import ReactMapGL, { Marker } from 'react-map-gl';
+import ReactMapGL, { Marker, Popup } from 'react-map-gl';
+import Banner from './Banner';
 import './style.css'
-
 import * as data from '../data/get-latest.json';
-import * as skate_data from '../data/skate-board.json';
 
+
+const ICON = `M20.2,15.7L20.2,15.7c1.1-1.6,1.8-3.6,1.8-5.7c0-5.6-4.5-10-10-10S2,4.5,2,10c0,2,0.6,3.9,1.6,5.4c0,0.1,0.1,0.2,0.2,0.3
+  c0,0,0.1,0.1,0.1,0.2c0.2,0.3,0.4,0.6,0.7,0.9c2.6,3.1,7.4,7.6,7.4,7.6s4.8-4.5,7.4-7.5c0.2-0.3,0.5-0.6,0.7-0.9
+  C20.1,15.8,20.2,15.8,20.2,15.7z`;
+
+const SIZE = 20;
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+
+const getColorFromCount= (count) => {
+    if (count > 100){
+        return "red";
+    }
+    if(count >= 10 ){
+        return "green";
+    }
+    return "grey";
+}
+
 
 export default function Map() {
     const [viewport, setViewport] = useState({
         width: "100vw",
         height: "100vh",
-        latitude: 37.7577,
-        longitude: -122.4376,
+        latitude: 36.204823,
+        longitude: 138.25293,
         zoom: 8
     });
 
+    const [selectedArea, setSelectedArea] = useState({
+        selected_report : null,
+        selected_place : null
+    }
+    );
+
     // const places =[];
     const places = data.places;
-    
+
+    useEffect(() => {
+        const listener = (e) => {
+            if (e.key === "Escape") {
+                setSelectedArea(null);
+            }
+        };
+        window.addEventListener("keydown", listener);
+
+        return () => {
+            window.removeEventListener("keydown", listener)
+        }
+    }, [])
 
     return (
         <div>
+            <Banner />
             <ReactMapGL
                 {...viewport}
                 mapStyle="mapbox://styles/mapbox/dark-v10"
                 onViewportChange={setViewport}
             >
-                {skate_data.features.map(park =>
-                    // const square = function(number) { return number * number }
-                    (
-                        <Marker key={park.properties.PARK_ID} longitude={park.geometry.coordinates[0]} latitude={park.geometry.coordinates[1]}>
-                            <button className="marker-btn">
-                                {/* <img src="../logo.svg"></img> */}
-                                {/* <div>Find Me</div> */}
-                                {/* {console.log(currentPlace.longitude)} */}
-                            </button>
-                        </Marker>
-
-                    )
-                )
-                }
-
 
                 {data.reports
                     .filter(report => !report.hide)
                     .map(report => {
                         const { infected, placeId } = report;
                         const currentPlace = places.find(place => place.id == placeId);
-                        // currentPlaces
-                        // console.log(currentPlace);
-                        // new mapboxgl.Marker({
-                        //     // color: getColorFromCount(infected)
-                        //     color:"grey"
-                        // })
-                        // .setLngLat([currentPlace.longitude, currentPlace.latitude])
-                        // .addTo(map);
-                        // console.log(currentPlace.longitude);
-                    
-                     
-                            // <Marker key={placeId} longitude={currentPlace.longitude} latitude={currentPlace.latitude}>
-                            (<Marker  longitude={138.25293} latitude={36.204823}>
+                        const color = getColorFromCount(infected);
 
-                                <button className="marker-btn">
-                                    {/* <img src="../logo.svg"></img> */}
-                                    {/* <div>Find Me</div> */}
-                                    {/* {console.log(currentPlace.longitude)} */}
-                                </button>
+                        return (
+                            <Marker key={placeId} longitude={currentPlace.longitude} latitude={currentPlace.latitude}>
 
-                            </Marker>
+                                    <svg
+                                        height={SIZE}
+                                        viewBox="0 0 24 24"
+                                        style={{
+                                            cursor: 'pointer',
+                                            fill: `${color}`,
+                                            stroke: 'none',
+                                            transform: `translate(${-SIZE / 2}px,${-SIZE}px)`
+                                        }}
+                                        onClick={e => {
+                                            e.preventDefault();
+                                            setSelectedArea(
+                                                selected_report = report,
+                                                selected_place= currentPlace
+                                            )}}
+                                    >
+                                    <path d={ICON} />
+                                    </svg>
+                                </Marker>
                             )
 
                     })
                 }
 
+                                
 
             </ReactMapGL>
         </div>
