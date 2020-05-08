@@ -15,7 +15,7 @@ const ICON = `M20.2,15.7L20.2,15.7c1.1-1.6,1.8-3.6,1.8-5.7c0-5.6-4.5-10-10-10S2,
 
 const SIZE = 20;
 
-mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+mapboxgl.accessToken = REACT_APP_MAPBOX_ACCESS_TOKEN;
 
 const getColorFromCount = (count) => {
     if (count > 100) {
