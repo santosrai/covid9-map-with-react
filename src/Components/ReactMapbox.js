@@ -17,11 +17,11 @@ const SIZE = 20;
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
-const getColorFromCount= (count) => {
-    if (count > 100){
+const getColorFromCount = (count) => {
+    if (count > 100) {
         return "red";
     }
-    if(count >= 10 ){
+    if (count >= 10) {
         return "green";
     }
     return "grey";
@@ -37,19 +37,14 @@ export default function Map() {
         zoom: 8
     });
 
-    const [selectedArea, setSelectedArea] = useState({
-        selected_report : null,
-        selected_place : null
-    }
-    );
+    const [selectedArea, setSelectedArea] = useState(null);
 
-    // const places =[];
     const places = data.places;
 
     useEffect(() => {
         const listener = (e) => {
             if (e.key === "Escape") {
-                setSelectedArea(null);
+                setSelectedArea({});
             }
         };
         window.addEventListener("keydown", listener);
@@ -68,7 +63,7 @@ export default function Map() {
                 onViewportChange={setViewport}
             >
 
-                {data.reports
+                { data.reports
                     .filter(report => !report.hide)
                     .map(report => {
                         const { infected, placeId } = report;
@@ -78,31 +73,46 @@ export default function Map() {
                         return (
                             <Marker key={placeId} longitude={currentPlace.longitude} latitude={currentPlace.latitude}>
 
-                                    <svg
-                                        height={SIZE}
-                                        viewBox="0 0 24 24"
-                                        style={{
-                                            cursor: 'pointer',
-                                            fill: `${color}`,
-                                            stroke: 'none',
-                                            transform: `translate(${-SIZE / 2}px,${-SIZE}px)`
-                                        }}
-                                        onClick={e => {
-                                            e.preventDefault();
-                                            setSelectedArea(
-                                                selected_report = report,
-                                                selected_place= currentPlace
-                                            )}}
-                                    >
+                                <svg
+                                    height={SIZE}
+                                    viewBox="0 0 24 24"
+                                    style={{
+                                        cursor: 'pointer',
+                                        fill: `${color}`,
+                                        stroke: 'none',
+                                        transform: `translate(${-SIZE / 2}px,${-SIZE}px)`
+                                    }}
+                                    onClick={e => {
+                                        e.preventDefault();
+                                        setSelectedArea(prevState => ({
+                                            ...prevState,
+                                            selected_report: report,
+                                            selected_place: currentPlace
+                                        })
+                                        )
+                                    }}
+                                >
                                     <path d={ICON} />
-                                    </svg>
-                                </Marker>
-                            )
+                                </svg>
+                            </Marker>
+                        )
 
                     })
                 }
 
-                                
+                { selectedArea ?
+                (<Popup latitude={selectedArea.selected_place.latitude} longitude={selectedArea.selected_place.longitude}
+                    onClose={()=>{
+                       setSelectedArea(null); 
+                    }}
+                >
+                    <h3> {selectedArea.selected_place.country}</h3>
+                    <p>Confirmed : {selectedArea.selected_report.infected}</p>
+                    <p>Recovered : {selectedArea.selected_report.recovered}</p>
+                    <p>Death : {selectedArea.selected_report.dead}</p>
+                </Popup>)
+                :null
+                }
 
             </ReactMapGL>
         </div>
